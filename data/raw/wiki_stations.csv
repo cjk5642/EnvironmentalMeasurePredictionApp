@@ -1,0 +1,123 @@
+Forecast office,State,Office call sign,Address,Clean office,State abbr
+Anchorage[3],Alaska,AFC,"6930 Sand Lake Rd, Anchorage, AK 99502",Anchorage,AK
+Fairbanks[4],Alaska,AFG,"UAF-Akasofu Building, Fairbanks, AK 99775-7345",Fairbanks,AK
+Juneau[5],Alaska,AJK,"8500 Mendenhall Loop Rd, Juneau, AK 99801",Juneau,AK
+Denver - Boulder,Colorado,BOU,"325 Broadway Boulder, CO 80305",Denver,CO
+Grand Junction,Colorado,GJT,"2844 Aviators Way Grand Junction, CO 81506",Grand Junction,CO
+Pueblo,Colorado,PUB,"3 Eaton Way Pueblo, CO 81001",Pueblo,CO
+Chicago,Illinois,LOT,"333 West University Drive Romeoville, IL 60446",Chicago,IL
+Lincoln,Illinois,ILX,"1362 State Route 10 Lincoln, IL 62656",Lincoln,IL
+Indianapolis,Indiana,IND,"6900 West Hanna Avenue Indianapolis, IN 46241",Indianapolis,IN
+Northern Indiana (Syracuse),Indiana,IWX,"7506 E 850 N Syracuse, IN 46567",Syracuse,IN
+Davenport/Quad Cities,Iowa,DVN,"9040 N Harrison Street, Davenport, IA, 52806",Davenport,"IA,"
+Des Moines,Iowa,DMX,"9607 NW Beaver Drive Johnston, IA 50131",Des Moines,IA
+Dodge City,Kansas,DDC,"104 Airport Road Dodge City, KS, 67801",Dodge City,"KS,"
+Goodland,Kansas,GLD,"920 Armory Road Goodland, KS 67735",Goodland,KS
+Topeka,Kansas,TOP,"1116 NE Strait Avenue Topeka, KS 66616",Topeka,KS
+Wichita,Kansas,ICT,"2142 S. Tyler Road Wichita, KS 67209",Wichita,KS
+Jackson,Kentucky,JKL,"1329 Airport Road Jackson, KY 41339",Jackson,KY
+Louisville,Kentucky,LMK,"6201 Theiler Lane Louisville, KY 40229",Louisville,KY
+Paducah,Kentucky,PAH,"8250 Kentucky Highway 3520 West Paducah, KY 42086",Paducah,KY
+Detroit/Pontiac,Michigan,DTX,"9200 White Lake Road White Lake, MI 48386",Detroit,MI
+Gaylord,Michigan,APX,"8800 Passenheim Road Gaylord, MI 49735",Gaylord,MI
+Grand Rapids,Michigan,GRR,"4899 Tim Dougherty Dr, Grand Rapids, MI 49512",Grand Rapids,MI
+Marquette,Michigan,MQT,"112 Airpark Drive South Negaunee, MI 49866",Marquette,MI
+Duluth,Minnesota,DLH,"5027 Miller Trunk Highway Duluth, MN 55811",Duluth,MN
+Chanhassen/Twin Cities,Minnesota,MPX,"1733 Lake Drive West Chanhassen, MN, 55317",Chanhassen,"MN,"
+Kansas City/Pleasant Hill,Missouri,EAX,"1803 North 7 Highway Pleasant Hill, MO 64080",Kansas City,MO
+Springfield,Missouri,SGF,"5805 West Highway EE Springfield, MO 65802",Springfield,MO
+St. Louis,Missouri,LSX,"12 Missouri Research Park Drive St. Charles, MO 63304",St. Louis,MO
+Hastings,Nebraska,GID,"6365 North Osborne Drive West Hastings, NE 68901",Hastings,NE
+North Platte,Nebraska,LBF,"5250 E. Lee Bird Drive North Platte, NE 69101",North Platte,NE
+Omaha/Valley,Nebraska,OAX,"6707 North 288th Street Valley, NE 68064",Omaha,NE
+Bismarck,North Dakota,BIS,"2301 University Drive Building 27 Bismarck, ND 58504",Bismarck,ND
+Grand Forks,North Dakota,FGF,"4797 Technology Circle Grand Forks, ND 58203",Grand Forks,ND
+Aberdeen,South Dakota,ABR,"824 391st Ave S. Aberdeen, SD 57401-9311",Aberdeen,SD
+Rapid City,South Dakota,UNR,"300 East Signal Drive Rapid City, SD 57701",Rapid City,SD
+Sioux Falls,South Dakota,FSD,"26 Weather Lane Sioux Falls, SD 57104",Sioux Falls,SD
+Green Bay,Wisconsin,GRB,"2485 South Point Road Green Bay, WI 54313",Green Bay,WI
+La Crosse,Wisconsin,ARX,"N2788 County Road FA La Crosse, WI 54601",La Crosse,WI
+Milwaukee/Sullivan,Wisconsin,MKX,"N3533 Hardscrabble Road Dousman, WI 53118",Milwaukee,WI
+Cheyenne,Wyoming,CYS,"1301 Airport Parkway Cheyenne, WY 82001",Cheyenne,WY
+Riverton,Wyoming,RIW,"12744 West US Highway 26 Riverton, WY 82501",Riverton,WY
+Caribou,Maine,CAR,"810 Main St, Caribou, ME 04736",Caribou,ME
+Gray/Portland,Maine,GYX,"1 Weather Ln, Gray, ME 04039",Gray,ME
+Boston/Norton,Massachusetts,BOX,"46 Commerce Way, Norton, MA 02766",Boston,MA
+Mount Holly/Philadelphia,New Jersey,PHI,"732 Woodlane Rd, Mt Holly, NJ 08060",Mount Holly,NJ
+Albany,New York,ALY,"ETEC - National Weather Service 1400 Washington Avenue, Albany, NY 12222",Albany,NY
+Binghamton,New York,BGM,"32 Dawes Dr, Johnson City, NY 13790",Binghamton,NY
+Buffalo,New York,BUF,"587 Aero Drive, Cheektowaga, NY 14225",Buffalo,NY
+New York/Upton,New York,OKX,"175 Brookhaven Ave, Upton, NY 11973",New York,NY
+Newport/Morehead City,North Carolina,MHX,"533 Roberts Rd, Newport, NC 28570",Newport,NC
+Raleigh,North Carolina,RAH,"1005 Capability Dr #300, Raleigh, NC 27606",Raleigh,NC
+Wilmington,North Carolina,ILM,"2015 Gardner Dr, Wilmington, NC 28405",Wilmington,NC
+Cleveland,Ohio,CLE,"925 Keynote Circle Suite 314, Brooklyn Heights, OH 44131",Cleveland,OH
+Wilmington (de facto “Cincinnati/Wilmington”),Ohio,ILN,"1901 OH-134, Wilmington, OH 45177",Cincinnati,OH
+Pittsburgh,Pennsylvania,PBZ,"192 Shafer Rd, Coraopolis, PA 15108",Pittsburgh,PA
+State College,Pennsylvania,CTP,"328 Innovation Blvd, State College, PA 16803",State College,PA
+Charleston,South Carolina,CHS,"5777 S Aviation Ave, North Charleston, SC 29406",Charleston,SC
+Columbia,South Carolina,CAE,"2909 Aviation Way West, Columbia, SC 29170",Columbia,SC
+Greenville-Spartanburg,South Carolina,GSP,"1549 GSP Dr, Greer, SC 29651",Greenville,SC
+Burlington,Vermont,BTV,"1200 Airport Dr, South Burlington, VT 05403",Burlington,VT
+Baltimore/Washington,Virginia,LWX,"43858 Weather Service Road, Sterling, VA 20166",Baltimore,VA
+Blacksburg/Roanoke,Virginia,RNK,"1750 Forecast Dr, Blacksburg, VA 24060",Blacksburg,VA
+Wakefield,Virginia,AKQ,"10009 General Mahone Hwy, Wakefield, VA 23888",Wakefield,VA
+Charleston,West Virginia,RLX,"400 Parkway Rd, Charleston, WV 25309",Charleston,WV
+Guam,Guam,GUM,"3232 Hueneme Rd, Barrigada, GU, 96913",Guam,"GU,"
+Honolulu,Hawaii,HFO[6],"2525 Correa Rd # 250, Honolulu, HI 96822",Honolulu,HI
+Birmingham,Alabama,BMX,"465 Weather Vane Rd, Calera, AL 35040",Birmingham,AL
+Huntsville,Alabama,HUN,"320 Sparkman Dr NW, Huntsville, AL 35805",Huntsville,AL
+Mobile/Pensacola,Alabama,MOB,"8400 Airport Blvd #11, Mobile, AL 36608",Mobile,AL
+Little Rock,Arkansas,LZK,"8400 Remount Rd, North Little Rock, AR 72118",Little Rock,AR
+Jacksonville,Florida,JAX,"13701 Fang Dr, Jacksonville, FL 32218",Jacksonville,FL
+Key West,Florida,KEY,"1315 White St, Key West, FL 33040",Key West,FL
+Melbourne,Florida,MLB,"421 Croton Rd, Melbourne, FL 32901",Melbourne,FL
+Miami,Florida,MFL,"11691 SW 17th Street Miami, FL 33165",Miami,FL
+Tallahassee,Florida,TAE,"1017 Academic Way FSU, Love Bldg, 4th Floor, Tallahassee, FL 32306-4509",Tallahassee,FL
+Tampa,Florida,TBW,"2525 14th Ave SE, Ruskin, FL 33570",Tampa,FL
+Peachtree City/Atlanta,Georgia,FFC,"4 Falcon Dr, Peachtree City, GA 30269",Peachtree City,GA
+Lake Charles,Louisiana,LCH,"500 Airport Blvd, Lake Charles, LA 70607",Lake Charles,LA
+New Orleans/Baton Rouge,Louisiana,LIX,"62300 Airport Rd. Slidell, LA 70460",New Orleans,LA
+Shreveport,Louisiana,SHV,"5655 Hollywood Ave, Shreveport, LA 71109",Shreveport,LA
+Jackson,Mississippi,JAN,"234 Weather Service Dr, Flowood, MS 39232",Jackson,MS
+Albuquerque,New Mexico,ABQ,"2341 Clark Carr Loop SE, Albuquerque, NM 87106",Albuquerque,NM
+Norman/Oklahoma City,Oklahoma,OUN,"120 David L. Boren Blvd. Suite 2400, Norman, OK 73072",Norman,OK
+Tulsa,Oklahoma,TSA,"10159 E 11th St #300, Tulsa, OK 74128",Tulsa,OK
+San Juan,Puerto Rico,SJU,"5000 Expreso Román Baldorioty de Castro, Carolina, PR 00979",San Juan,PR
+Memphis,Tennessee,MEG,"7777 Walnut Grove Rd #1, Memphis, TN 38120",Memphis,TN
+Morristown/Knoxville,Tennessee,MRX,"5974 Commerce Blvd, Talbott, TN 37877",Morristown,TN
+Nashville,Tennessee,OHX,"500 Weather Station Rd, Old Hickory, TN 37138",Nashville,TN
+Amarillo,Texas,AMA,"1900 English Rd, Amarillo, TX 79108",Amarillo,TX
+Austin/San Antonio,Texas,EWX,"2090 Airport Rd, New Braunfels, TX 78130",Austin,TX
+Brownsville,Texas,BRO,"20 S Vermillion Ave, Brownsville, TX 78521",Brownsville,TX
+Corpus Christi,Texas,CRP,"426 Pinson Dr, Corpus Christi, TX 78406",Corpus Christi,TX
+El Paso,Texas,EPZ,"7955 Airport Rd, Santa Teresa, NM 88008",El Paso,NM
+Fort Worth-Dallas,Texas,FWD,"3401 Northern Cross Blvd, Fort Worth, TX 76137",Fort Worth,TX
+Houston/Galveston,Texas,HGX,"1353 FM646, Dickinson, TX 77539",Houston,TX
+Lubbock,Texas,LUB,"2579 S Loop 289 #100, Lubbock, TX 79423",Lubbock,TX
+Midland/Odessa,Texas,MAF,"2500 Challenger Dr, Midland, TX 79706",Midland,TX
+San Angelo,Texas,SJT,"7654 Knickerbocker Rd, San Angelo, TX 76904",San Angelo,TX
+Flagstaff,Arizona,FGZ,"Building 49 Hughes Ave, Bellemont, AZ 86015",Flagstaff,AZ
+Phoenix,Arizona,PSR,"2727 E Washington St, NWS PAB 1TA, Phoenix, AZ 85034[7]",Phoenix,AZ
+Tucson,Arizona,TWC,"520 N Park Ave #304, Tucson, AZ 85719",Tucson,AZ
+Eureka,California,EKA,"300 Startare Dr, Eureka, CA 95501",Eureka,CA
+Los Angeles/Oxnard,California,LOX,"520 N Elevar St, Oxnard, CA 93030",Los Angeles,CA
+Sacramento,California,STO,"3310 El Camino Ave # 228, Sacramento, CA 95821",Sacramento,CA
+San Diego,California,SGX,"11440 W Bernardo Ct #230, San Diego, CA 92127",San Diego,CA
+San Francisco Bay Area/Monterey,California,MTR,"21 Grace Hopper Ave, Monterey, CA 93943",San Francisco Bay Area,CA
+San Joaquin Valley/Hanford,California,HNX,"900 Foggy Bottom Rd, Hanford, CA 93230",San Joaquin Valley,CA
+Boise,Idaho,BOI,"NIFC Building 3807, 3833 Development Ave, Boise, ID 83705",Boise,ID
+Pocatello,Idaho,PIH,"1945 Beechcraft Ave, Pocatello, ID 83204",Pocatello,ID
+Billings,Montana,BYZ,"2170 Overland Ave, Billings, MT 59102",Billings,MT
+Glasgow,Montana,GGW,"92 Airport Rd, Glasgow, MT 59230",Glasgow,MT
+Great Falls,Montana,TFX,"5324 Tri Hill Frontage Rd, Great Falls, MT 59404",Great Falls,MT
+Missoula,Montana,MSO,"6633 Aviation Way, Missoula, MT 59808",Missoula,MT
+Elko,Nevada,LKN,"3720 Paradise Dr, Elko, NV 89801",Elko,NV
+Las Vegas,Nevada,VEF,"7851 Dean Martin Dr, Las Vegas, NV 89139",Las Vegas,NV
+Reno,Nevada,REV,"2350 Raggio Pkwy, Reno, NV 89512",Reno,NV
+Medford,Oregon,MFR,"4003 Cirrus Dr, Medford, OR 97504",Medford,OR
+Pendleton,Oregon,PDT,"2001 NW 56th St, Pendleton, OR 97801",Pendleton,OR
+Portland,Oregon,PQR,"5241 NE 122nd Ave, Portland, OR 97230",Portland,OR
+Salt Lake City,Utah,SLC,"2242 W North Temple, Salt Lake City, UT 84116",Salt Lake City,UT
+Seattle,Washington,SEW,"7600 Sand Point Way NE, Seattle, WA 98115 [8]",Seattle,98115
+Spokane,Washington,OTX,"2601 N Rambo Rd, Spokane, WA 99224",Spokane,WA
