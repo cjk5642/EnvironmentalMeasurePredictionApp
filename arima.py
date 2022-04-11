@@ -27,8 +27,8 @@ class WeatherARIMA:
         self.order = self._extract_order()
     
     def _extract_weather_data(self):
-        data = self.weatherdata.weather_data
-        data = data.loc[(data['callsign'] == self.callsign), ['date', self.measure]].set_index('date').asfreq("D")
+        data = self.weatherdata.weather_data.copy()
+        data = data.loc[data['callsign'] == self.callsign, ['date', self.measure]].reset_index(drop = True).set_index('date')
         return data
         
     def _extract_order(self) -> tuple:
@@ -36,9 +36,6 @@ class WeatherARIMA:
         order_values = data.values[0]
         order = tuple(list(order_values))
         return order
-    
-    def _fit_model(self, data, order):
-        pass
     
     def predict(self):
         date_split = pd.to_datetime(datetime.now().date()) - relativedelta(days = 30)
@@ -54,8 +51,6 @@ class WeatherARIMA:
             predictions.append(yhat)
             obs = test[i]
             history.append(obs)
-        predictions = pd.DataFrame(predictions)
-        predictions.columns = ['Prediction']
         return predictions
     
 def join_station_measure(station, measure):

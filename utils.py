@@ -5,22 +5,32 @@ from datetime import datetime
 from tqdm import tqdm
 import numpy as np
 from dateutil.relativedelta import relativedelta
+import warnings
+warnings.filterwarnings("ignore")
 
 class WeatherData:
   weather_stations = None
+  ohe_callsign = None
   weather_data = None
   wiki_stations = None
-  def __init__(self):
+  def __init__(self, update = True):
     self.output_dir = os.path.join('data', 'raw')
     self.start_date = datetime(2018, 1, 1)
+    self.update = update
 
     if WeatherData.wiki_stations is None:
       WeatherData.wiki_stations = self._collect_wiki_stations()
+      
     if WeatherData.weather_stations is None:
       WeatherData.weather_stations = self.collect_weather_stations()
+
+    if WeatherData.ohe_callsign is None:
+      WeatherData.ohe_callsign = self.one_hot_callsign()
+
     if WeatherData.weather_data is None:
       WeatherData.weather_data = self.collect_data_by_weather_station()
-
+      #WeatherData.weather_data = self._interpolate_data(WeatherData.weather_data.copy())
+  
   def __str__(self):
     return "This is a function that extracts weather data per call sign"
 
@@ -62,14 +72,11 @@ class WeatherData:
     return data
 
   def _interpolate_data(self, data):
-    call = data.callsign.unique()
-    min_date = data.date.min()
-    max_date = data.date.max()
+    call = data['callsign'].unique()
+    min_date = data['date'].min()
+    max_date = data['date'].max()
     date_range = pd.date_range(min_date, max_date)
-    new_weather= data.set_index(['callsign', 'date'])
-    new_index = pd.MultiIndex.from_product([call, date_range])
-    new_weather = new_weather.reindex(new_index, axis = 0)
-    new = new_weather.reset_index().rename({'level_0': 'callsign', 'level_1': 'date'}, axis = 1)
+    new= data.set_index(['callsign', 'date']).reset_index()
     interpolated = []
     for u in new.callsign.unique():
       temp = new[new.callsign == u]
@@ -78,7 +85,8 @@ class WeatherData:
       together = pd.concat([first, interp], axis = 1)
       interpolated.append(together)
     new_weather = pd.concat(interpolated, axis = 0)
-    new_weather = new_weather.drop(['tsun', 'wpgt'], axis = 1)
+    if 'tsun' in new_weather.columns and 'wpgt' in new_weather.columns:
+      new_weather = new_weather.drop(['tsun', 'wpgt'], axis = 1)
     return new_weather
 
   # collect weather stations
@@ -96,6 +104,14 @@ class WeatherData:
     else:
       stations = pd.read_csv(output_path)
     return stations
+
+  def one_hot_callsign(self):
+    output_path = os.path.join(self.output_dir, 'ohe_callsigns.csv')
+    if os.path.exists(output_path):
+      return pd.read_csv(output_path)
+    new_data = pd.get_dummies(sorted(WeatherData.weather_stations.callsign.unique())).T.reset_index().rename({'index': 'callsign'}, axis = 1)
+    new_data.to_csv(output_path, index = False)
+    return new_data
 
   def _collect_data_by_weather_station_helper(self, date):
     list_of_frames = []
@@ -123,19 +139,19 @@ class WeatherData:
       total_frames.to_csv(output_path, index = False)
     else:
       total_frames = pd.read_csv(output_path, parse_dates = ['date'])
-      last_date = total_frames['date'].max() - relativedelta(days = 1)
-      if last_date < datetime.now().date()-relativedelta(days = 1):
-        print("Updating weather by stations dataset...")
-        new_data = self._collect_data_by_weather_station_helper(date = last_date)
-        new_data = self._interpolate_data(new_data)
-        total_frames = pd.concat([total_frames, new_data], axis = 0, ignore_index = True)
-        total_frames['date'] = pd.to_datetime(total_frames['date'])
-        total_frames.to_csv(output_path, index = False)
-
+      if self.update:
+        last_date = total_frames['date'].max() - relativedelta(days = 1)
+        if last_date < datetime.now().date()-relativedelta(days = 1):
+          print("Updating weather by stations dataset...")
+          new_data = self._collect_data_by_weather_station_helper(date = last_date)
+          new_data = self._interpolate_data(new_data)
+          total_frames = pd.concat([total_frames, new_data], axis = 0, ignore_index = True)
+          total_frames['date'] = pd.to_datetime(total_frames['date'])
+          total_frames.to_csv(output_path, index = False)
     return total_frames
   
   def _calc_end_range(self, date, num_prev: int):
-    return date + pd.to_timedelta(f"{num_prev} days") + pd.to_timedelta("29 days")
+    return date + relativedelta(days = num_prev + 30)
 
   def ml_data(self, start_date: str, num_prev: int = 365):
     start_date = pd.to_datetime(start_date)
@@ -162,15 +178,18 @@ class WeatherData:
       while max_date != end_range:
         row = temp.loc[min_date:end_range]
         splits = end_range - thirtydays
-        values = np.array(row[min_date:splits])
-        labels = np.array(row[splits+one_day:])
-        collection['X'].append(values.reshape(1, -1))
-        collection['y'].append(labels.reshape(1, -1))
-
+        values = row.loc[min_date:splits, 'value'].to_list()
+        labels = row.loc[splits+one_day:, 'value'].to_list()
+        collection['X'].append(values)
+        collection['y'].append(labels)
         min_date += one_day
         end_range = self._calc_end_range(min_date, num_prev = num_prev)
-      collection['X'] = pd.DataFrame(np.stack(collection['X']).reshape(-1, num_prev))
-      collection['y'] = pd.DataFrame(np.stack(collection['y']).reshape(-1, 30))
+      
+      X = np.stack(collection['X'], axis = 0)
+      y = np.stack(collection['y'], axis = 0)
+      collection['X'] = pd.DataFrame(X)
+      collection['y'] = pd.DataFrame(y)
+      
       # add the callsigns and measures
       for dat in ['X', 'y']:
         for string_val, val in zip(['callsign', 'measure'], [c, m]):

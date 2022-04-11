@@ -7,15 +7,14 @@ Created on Fri Mar 25 11:43:28 2022
 
 # Run this app with `python app.py` and
 # visit http://127.0.0.1:8050/ in your web browser.
-
-from dash import Dash
+import pandas as pd
+from dash import Dash, dcc, html
 from dash.dependencies import Input, Output
-import dash_core_components as dcc
-import dash_html_components as html
+#import dash_core_components as dcc
+#import dash_html_components as html
 import plotly.express as px
 import dash_bootstrap_components as dbc
 from utils import WeatherData
-import pandas as pd
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from statsmodels.tsa.seasonal import seasonal_decompose
@@ -23,6 +22,8 @@ from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 from arima import WeatherARIMA, ARIMAPrediction, join_station_measure
 import numpy as np
+import warnings
+warnings.filterwarnings("ignore")
 
 # get the stations
 wd = WeatherData()
@@ -235,31 +236,15 @@ app.layout = dbc.Container(children = [
 def create_seasonal_plots(data, measure_name):
     # seasonal plots
     seasonal_plot = seasonal_decompose(data[['date', measure_name]].set_index('date'))
-    fig = make_subplots(rows=3, cols=1,
-                        shared_xaxes=True,
-                        vertical_spacing=0.02)
-    fig.append_trace(
-        go.Line(x = data['date'], y = seasonal_plot.trend),
-        row = 1, col = 1
-    )
-    
-    fig.append_trace(
-        go.Line(x = data['date'], y = seasonal_plot.seasonal),
-        row = 2, col = 1
-    )
-    fig.append_trace(
-        go.Scatter(x = data['date'], y = seasonal_plot.resid),
-        row = 3, col = 1
-    )
-    fig.update_xaxes(title_text="", row=1, col=1)
-    fig.update_xaxes(title_text="", row=2, col=1)
-    fig.update_xaxes(title_text="Date [1D]", row=3, col=1)
-    
-    fig.update_yaxes(title_text="Trend", row=1, col=1)
-    fig.update_yaxes(title_text="Seasonal", row=2, col=1)
-    fig.update_yaxes(title_text="Residuals", row=3, col=1)
-    
-    fig.update_layout(showlegend=False)
+    season_data = pd.DataFrame({'trend': seasonal_plot.trend, 
+                                'seasonal': seasonal_plot.seasonal, 
+                                'resid': seasonal_plot.resid})
+    season_data = season_data.reset_index()
+    season_data = season_data.melt(id_vars=['date']).rename({'variable': "Variables"}, axis = 1)
+    fig = px.line(data_frame = season_data, x = "date", y = "value", facet_row="Variables", hover_name="Variables", hover_data=["value"],
+    labels={"value": "Value", 'date': "Date [1D]"}, title="Seasonal Decomposition of Additive Base Model")
+    fig.update_yaxes(title=None)
+    fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
     return fig
                 
 @app.callback(
@@ -300,7 +285,7 @@ def update_graph(model_name, station_name, measure_name, time_name, slider_value
         dates = pd.date_range(now, pd.to_datetime(now + relativedelta(days = 30)))
         last_row = subset_data.tail(1)
         arimaprediction = ARIMAPrediction(station_name, measure_name)
-        predictions = [last_row[measure_name]] + list(np.array(arimaprediction.predictions.get(join_name)).reshape(1, -1))[0]
+        predictions = arimaprediction.predictions.get(join_name)
         arima_data = pd.DataFrame({'date': dates, measure_name: predictions})
         arima_data['type'] = 'Prediction'
         arima_data = arima_data.iloc[:slider_value]
@@ -310,7 +295,8 @@ def update_graph(model_name, station_name, measure_name, time_name, slider_value
         fig = px.line(new_data, x = 'date', y = measure_name, color = 'type',
                       labels = {measure_name: measure_conversions[measure_name],
                                 'date': 'Date [1D]'},
-                      title = f"{measure_conversions[measure_name]} by Date for {station_name}")
+                      title = f"{measure_conversions[measure_name]} by Date for {station_name}", 
+                      markers = True)
     
     # if no model selected
     else:
@@ -318,7 +304,7 @@ def update_graph(model_name, station_name, measure_name, time_name, slider_value
         fig = px.line(subset_data, x = 'date', y = measure_name,
                       labels = {measure_name: measure_conversions[measure_name],
                                 'date': 'Date [1D]'},
-                      title = f"{measure_conversions[measure_name]} by Date for {station_name}")
+                      title = f"{measure_conversions[measure_name]} by Date for {station_name}", markers = True)
     
     
     fig1 = create_seasonal_plots(subset_data, measure_name)
