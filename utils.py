@@ -143,11 +143,13 @@ class WeatherData:
         last_date = total_frames['date'].max() - relativedelta(days = 1)
         if last_date < datetime.now().date()-relativedelta(days = 1):
           print("Updating weather by stations dataset...")
-          new_data = self._collect_data_by_weather_station_helper(date = last_date)
+          new_data = self._collect_data_by_weather_station_helper(date = total_frames['date'].max())
           new_data = self._interpolate_data(new_data)
           total_frames = pd.concat([total_frames, new_data], axis = 0, ignore_index = True)
           total_frames['date'] = pd.to_datetime(total_frames['date'])
+          total_frames = total_frames.drop_duplicates(subset = ['callsign', 'date']).sort_values(['callsign', 'date'])
           total_frames.to_csv(output_path, index = False)
+
     return total_frames
   
   def _calc_end_range(self, date, num_prev: int):

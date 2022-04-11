@@ -235,7 +235,7 @@ app.layout = dbc.Container(children = [
 
 def create_seasonal_plots(data, measure_name):
     # seasonal plots
-    seasonal_plot = seasonal_decompose(data[['date', measure_name]].set_index('date'))
+    seasonal_plot = seasonal_decompose(data[['date', measure_name]].set_index('date').asfreq('D'))
     season_data = pd.DataFrame({'trend': seasonal_plot.trend, 
                                 'seasonal': seasonal_plot.seasonal, 
                                 'resid': seasonal_plot.resid})
