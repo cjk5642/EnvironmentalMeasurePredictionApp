@@ -11,7 +11,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from multiprocessing import Pool, cpu_count
 
-weatherdata = WeatherData()
+weatherdata = WeatherData(update=False)
 
 class WeatherARIMA:
     models = None
