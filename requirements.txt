@@ -9,6 +9,7 @@ dash-renderer==1.1.2
 dash-table==5.0.0
 Flask-Compress==1.5.0
 fonttools==4.25.0
+gunicorn==20.1.0
 meteostat==1.6.1
 munkres==1.1.4
 patsy==0.5.2
