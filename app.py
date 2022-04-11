@@ -26,7 +26,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # get the stations
-wd = WeatherData()
+wd = WeatherData(update = False)
 
 measure_conversions = {"tavg": 'Average Temperature (°C)',
                        'tmin': 'Minimum Temperature (°C)',
