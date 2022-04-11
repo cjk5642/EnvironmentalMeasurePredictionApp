@@ -13,10 +13,6 @@ gunicorn==20.1.0
 matplotlib==3.3.4
 meteostat==1.6.1
 munkres==1.1.4
-numpy==1.20.1
-numpydoc==1.1.0
-pandas==1.2.4
-pandocfilters==1.4.3
 patsy==0.5.2
 Pillow==9.0.1
 plotly==5.7.0
