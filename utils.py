@@ -202,4 +202,6 @@ class WeatherData:
     values = pd.concat(new_values, ignore_index = True)
     labels = pd.concat(new_labels, ignore_index = True)
 
+    values = pd.merge(values, self.ohe_callsign, on = 'callsign', how = 'outer')
+
     return values, labels

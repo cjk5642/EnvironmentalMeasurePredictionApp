@@ -1,4 +1,7 @@
 import pandas as pd
-path = r"C:\Users\Collin\Documents\EnvironmentalMeasurePredictionApp\data\raw\weather_data_by_station.csv"
-adta = pd.read_csv(path)
-print(adta)
+from utils import WeatherData
+weather = WeatherData(update = False)
+values, labels = weather.ml_data("01-01-2022", num_prev=30)
+print(values)
+
+
