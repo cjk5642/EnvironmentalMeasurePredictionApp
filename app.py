@@ -229,8 +229,7 @@ app.layout = dbc.Container(children = [
     html.Hr(),
     row_figure,
     row_test,
-    html.Hr(),
-    row_footer
+    html.Hr()
 ])
 
 def create_seasonal_plots(data, measure_name):
