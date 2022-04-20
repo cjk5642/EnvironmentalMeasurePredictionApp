@@ -11,6 +11,7 @@ warnings.filterwarnings("ignore")
 class WeatherData:
   weather_stations = None
   ohe_callsign = None
+  ohe_measures = None
   weather_data = None
   wiki_stations = None
   def __init__(self, update = True):
@@ -20,16 +21,10 @@ class WeatherData:
 
     if WeatherData.wiki_stations is None:
       WeatherData.wiki_stations = self._collect_wiki_stations()
-      
-    if WeatherData.weather_stations is None:
-      WeatherData.weather_stations = self.collect_weather_stations()
-
-    if WeatherData.ohe_callsign is None:
-      WeatherData.ohe_callsign = self.one_hot_callsign()
-
-    if WeatherData.weather_data is None:
+      WeatherData.weather_stations = self.collect_weather_stations()      
       WeatherData.weather_data = self.collect_data_by_weather_station()
-      #WeatherData.weather_data = self._interpolate_data(WeatherData.weather_data.copy())
+      WeatherData.ohe_callsign = self.one_hot_callsign()
+      WeatherData.ohe_measures = self.one_hot_measure()
   
   def __str__(self):
     return "This is a function that extracts weather data per call sign"
@@ -109,7 +104,19 @@ class WeatherData:
     output_path = os.path.join(self.output_dir, 'ohe_callsigns.csv')
     if os.path.exists(output_path):
       return pd.read_csv(output_path)
-    new_data = pd.get_dummies(sorted(WeatherData.weather_stations.callsign.unique())).T.reset_index().rename({'index': 'callsign'}, axis = 1)
+    new_data = pd.get_dummies(sorted(WeatherData.weather_stations.callsign.unique())).T
+    new_data.columns = new_data.index
+    new_data = new_data.reset_index().rename({'index': 'callsign'}, axis = 1)
+    new_data.to_csv(output_path, index = False)
+    return new_data
+
+  def one_hot_measure(self):
+    output_path = os.path.join(self.output_dir, 'ohe_measures.csv')
+    if os.path.exists(output_path):
+      return pd.read_csv(output_path)
+    new_data = pd.get_dummies(sorted(WeatherData.weather_data.columns[2:])).T
+    new_data.columns = new_data.index
+    new_data = new_data.reset_index().rename({'index': 'measure'}, axis = 1)
     new_data.to_csv(output_path, index = False)
     return new_data
 
@@ -202,6 +209,5 @@ class WeatherData:
     values = pd.concat(new_values, ignore_index = True)
     labels = pd.concat(new_labels, ignore_index = True)
 
-    values = pd.merge(values, self.ohe_callsign, on = 'callsign', how = 'outer')
-
+    values = pd.merge(pd.merge(values, WeatherData.ohe_callsign, on = 'callsign', how = 'outer'), WeatherData.ohe_measures, on = 'measure', how= 'outer')
     return values, labels

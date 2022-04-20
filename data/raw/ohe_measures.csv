@@ -1,0 +1,9 @@
+measure,prcp,pres,snow,tavg,tmax,tmin,wdir,wspd
+prcp,1,0,0,0,0,0,0,0
+pres,0,1,0,0,0,0,0,0
+snow,0,0,1,0,0,0,0,0
+tavg,0,0,0,1,0,0,0,0
+tmax,0,0,0,0,1,0,0,0
+tmin,0,0,0,0,0,1,0,0
+wdir,0,0,0,0,0,0,1,0
+wspd,0,0,0,0,0,0,0,1
