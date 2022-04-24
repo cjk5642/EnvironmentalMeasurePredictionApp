@@ -184,12 +184,15 @@ row_dropdowns = html.Div(className = 'two columns', children = [
 row_figure = html.Div([
     dbc.Row([
         dbc.Col([
-            html.Div(id='labelUpdate')
-        ])
-    ]),
-    dbc.Row([
-        dbc.Col([
-            dcc.Graph(id = 'figureForecast', style = {"width": "99%"}),
+            dcc.Loading(
+                id = 'loading-1',
+                type = 'default',
+                children = [
+                    html.Div([
+                        dcc.Graph(id = 'figureForecast', style = {"width": "99%"})
+                    ])
+                ]
+            )
         ]),
         dbc.Col([
             dcc.Graph(id = 'figureSeasonal', style = {"width": "99%"})
@@ -219,10 +222,10 @@ row_footer = html.Div([
                 "Web Application: Collin J. Kovacs"
             ),
             html.P(
-                "ARIMA Model: Matthew Yeseta"
+                "ARIMA Model: Collin J. Kovacs"
             ),
             html.P(
-                "LSTM Model: Pankaj Singh/Collin J. Kovacs"
+                "LSTM Model: Pankaj Singh"
             )
         ]),
         dbc.Col([
@@ -234,24 +237,14 @@ row_footer = html.Div([
 ], style = {"background-color": "gray", 
             "width": "100%"})
 
-all_loading = dcc.Loading(
-    id = 'loading-1',
-    type = 'default',
-    children = [
-        html.Div([
-            row_dropdowns,
-            row_slider,
-            html.Hr(),
-            row_figure
-        ])
-    ]
-)
-
 app.layout = dbc.Container(children = [
     row_header,
     row_info,
     html.Br(),
-    all_loading,
+    row_dropdowns,
+    row_slider,
+    html.Hr(),
+    row_figure,
     row_test,
     html.Hr()
 ])
@@ -272,7 +265,6 @@ def create_seasonal_plots(data, measure_name):
     return fig
                 
 @app.callback(
-    Output('loading-1', 'children'),
     Output('figureForecast', 'figure'),
     Output('figureSeasonal', 'figure'),
     Input('dropdownModels', 'value'),
@@ -304,8 +296,7 @@ def update_graph(model_name, station_name, measure_name, time_name, slider_value
         model_name = [model_name]
     
     # if the user selectes arima
-    if model_name is not None:
-
+    if model_name is not None and len(model_name) != 0:
         join_name = join_station_measure(station_name, measure_name)
         dates = pd.date_range(now, pd.to_datetime(now + relativedelta(days = 29)))
         datas = []
