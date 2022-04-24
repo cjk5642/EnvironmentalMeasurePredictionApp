@@ -1,5 +1,5 @@
-from models import WeatherLSTM
-import numpy as np
+from utils import WeatherData
 
-wl = WeatherLSTM('Pittsburgh, PA', 'tavg')
-print(wl.predict())
+data = WeatherData(update=False).ml_data("01/01/2022", 30, normalize_by_values=True)
+print(data)
+
