@@ -67,10 +67,6 @@ class WeatherData:
     return data
 
   def _interpolate_data(self, data):
-    call = data['callsign'].unique()
-    min_date = data['date'].min()
-    max_date = data['date'].max()
-    date_range = pd.date_range(min_date, max_date)
     new= data.set_index(['callsign', 'date']).reset_index()
     interpolated = []
     for u in new.callsign.unique():

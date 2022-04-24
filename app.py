@@ -19,23 +19,22 @@ from dateutil.relativedelta import relativedelta
 from statsmodels.tsa.seasonal import seasonal_decompose
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
-import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
 
 # load the lstm model
 def load_lstm_model(path: str = r"./data/processed/oneModel"):
     lstm_model = keras.models.load_model(path)
-    lstm_model.compile(optimizer = 'adam', loss = 'mean_squared_error')
     return lstm_model
 
+global lstm_model
 lstm_model = load_lstm_model()
+
+# get the stations
+wd = WeatherData(update = False)
 
 # load the models
 from models import *
-
-# get the stations
-wd = WeatherData()
 
 # standard conversions for nice looking output
 measure_conversions = {"tavg": 'Average Temperature (°C)',
@@ -180,9 +179,14 @@ row_dropdowns = html.Div(className = 'two columns', children = [
         ], align = 'center'
         )
     ])
-])            
+])           
 
 row_figure = html.Div([
+    dbc.Row([
+        dbc.Col([
+            html.Div(id='labelUpdate')
+        ])
+    ]),
     dbc.Row([
         dbc.Col([
             dcc.Graph(id = 'figureForecast', style = {"width": "99%"}),
@@ -244,8 +248,7 @@ app.layout = dbc.Container(children = [
 
 def create_seasonal_plots(data, measure_name):
     # seasonal plots
-    sub_data = data[['date', measure_name]].set_index('date').asfreq('D')
-    print(sub_data)
+    sub_data = data.loc[data['type'] == 'History', ['date', measure_name]].set_index('date').asfreq('D')
     seasonal_plot = seasonal_decompose(sub_data)
     season_data = pd.DataFrame({'trend': seasonal_plot.trend, 
                                 'seasonal': seasonal_plot.seasonal, 
@@ -269,7 +272,7 @@ def create_seasonal_plots(data, measure_name):
     )
 def update_graph(model_name, station_name, measure_name, time_name, slider_value):
     subset_data = wd.weather_data.loc[wd.weather_data['callsign'] == station_name, ['date', measure_name]]
-    now = datetime.now().date()
+    now = subset_data['date'].max()
     time_splits = time_name.split('_')
     if time_splits[0] == 'all':
         prev_date = subset_data['date'].min()
@@ -291,8 +294,9 @@ def update_graph(model_name, station_name, measure_name, time_name, slider_value
     
     # if the user selectes arima
     if model_name is not None:
+
         join_name = join_station_measure(station_name, measure_name)
-        dates = pd.date_range(now, pd.to_datetime(now + relativedelta(days = 30)))
+        dates = pd.date_range(now, pd.to_datetime(now + relativedelta(days = 29)))
         datas = []
         for model in model_name:
             model_data = pd.DataFrame({'date': dates})
@@ -304,10 +308,9 @@ def update_graph(model_name, station_name, measure_name, time_name, slider_value
                 lstmprediction = LSTMPrediction(station_name, measure_name)
                 predictions = lstmprediction.predictions.get(join_name)
             model_data[measure_name] = predictions
-            model_data['type'] = model
-            datas.append(model_data)
-        datas = pd.concat(datas, axis = 0, ignore_index=True)
-        model_data = datas.iloc[:slider_value]
+            model_data['type'] = model.upper()
+            datas.append(model_data.iloc[:slider_value])
+        model_data = pd.concat(datas, axis = 0, ignore_index=True)
         subset_data = pd.concat([subset_data, model_data], axis = 0)
     
     # actually data

@@ -45,8 +45,9 @@ class WeatherLSTM:
         
     def predict(self):
         joined = tf.concat([self.weather_data, self.ohe_callsign, self.ohe_measures], axis = 1)
-        output = self.model.predict(joined)
-        output = self.std * output + self.mean
+        reshaped_joined = tf.reshape(joined, shape = (1, -1))
+        output = self.model.predict(reshaped_joined)
+        output = np.array(output*self.std + self.mean).tolist()[0]
         return output
     
 class LSTMPrediction:
@@ -82,7 +83,7 @@ class WeatherARIMA:
         return order
     
     def predict(self):
-        date_split = pd.to_datetime(datetime.now().date()) - relativedelta(days = 30)
+        date_split = pd.to_datetime(self.weather_data.index.max()) - relativedelta(days = 29)
         history, test = self.weather_data[:date_split], self.weather_data[date_split:]
         predictions = []
         history = list(history[self.measure])
@@ -90,7 +91,7 @@ class WeatherARIMA:
         
         for i in range(len(test)):
             model = ARIMA(history, order = self.order).fit()
-            preds = model.forecast(n=30)
+            preds = model.forecast(n=1)
             yhat = preds[0]
             predictions.append(yhat)
             obs = test[i]
