@@ -10,24 +10,34 @@ Created on Fri Mar 25 11:43:28 2022
 import pandas as pd
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output
-#import dash_core_components as dcc
-#import dash_html_components as html
 import plotly.express as px
 import dash_bootstrap_components as dbc
+from tensorflow import keras
 from utils import WeatherData
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from statsmodels.tsa.seasonal import seasonal_decompose
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
-from arima import WeatherARIMA, ARIMAPrediction, join_station_measure
 import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
 
+# load the lstm model
+def load_lstm_model(path: str = r"./data/processed/oneModel"):
+    lstm_model = keras.models.load_model(path)
+    lstm_model.compile(optimizer = 'adam', loss = 'mean_squared_error')
+    return lstm_model
+
+lstm_model = load_lstm_model()
+
+# load the models
+from models import *
+
 # get the stations
 wd = WeatherData()
 
+# standard conversions for nice looking output
 measure_conversions = {"tavg": 'Average Temperature (°C)',
                        'tmin': 'Minimum Temperature (°C)',
                        'tmax': 'Maximum Temperature (°C)',
@@ -110,7 +120,7 @@ row_dropdowns = html.Div(className = 'two columns', children = [
                 id='dropdownModels',
                 options=[
                     {'label': 'LSTM', 'value': 'lstm'},
-                    {'label': 'ARIMA', 'value': 'arima'},
+                    {'label': 'ARIMA', 'value': 'arima'}
                 ],
                 clearable=False,
                 searchable=False,
@@ -234,7 +244,9 @@ app.layout = dbc.Container(children = [
 
 def create_seasonal_plots(data, measure_name):
     # seasonal plots
-    seasonal_plot = seasonal_decompose(data[['date', measure_name]].set_index('date').asfreq('D'))
+    sub_data = data[['date', measure_name]].set_index('date').asfreq('D')
+    print(sub_data)
+    seasonal_plot = seasonal_decompose(sub_data)
     season_data = pd.DataFrame({'trend': seasonal_plot.trend, 
                                 'seasonal': seasonal_plot.seasonal, 
                                 'resid': seasonal_plot.resid})
@@ -274,37 +286,36 @@ def update_graph(model_name, station_name, measure_name, time_name, slider_value
     subset_data['type'] = 'History'
     
     # fix if the model is in list but only one model name
-    if isinstance(model_name, list):
-        if len(model_name) == 1:
-            model_name = model_name[0]
+    if isinstance(model_name, str):
+        model_name = [model_name]
     
     # if the user selectes arima
-    join_name = join_station_measure(station_name, measure_name)
-    if 'arima' == model_name:
+    if model_name is not None:
+        join_name = join_station_measure(station_name, measure_name)
         dates = pd.date_range(now, pd.to_datetime(now + relativedelta(days = 30)))
-        last_row = subset_data.tail(1)
-        arimaprediction = ARIMAPrediction(station_name, measure_name)
-        predictions = arimaprediction.predictions.get(join_name)
-        arima_data = pd.DataFrame({'date': dates, measure_name: predictions})
-        arima_data['type'] = 'Prediction'
-        arima_data = arima_data.iloc[:slider_value]
-        new_data = pd.concat([subset_data, arima_data], axis = 0)
-        
-        # actually data
-        fig = px.line(new_data, x = 'date', y = measure_name, color = 'type',
-                      labels = {measure_name: measure_conversions[measure_name],
-                                'date': 'Date [1D]'},
-                      title = f"{measure_conversions[measure_name]} by Date for {station_name}", 
-                      markers = True)
+        datas = []
+        for model in model_name:
+            model_data = pd.DataFrame({'date': dates})
+            if 'arima' == model:
+                arimaprediction = ARIMAPrediction(station_name, measure_name)
+                predictions = arimaprediction.predictions.get(join_name)
+
+            if 'lstm' == model:
+                lstmprediction = LSTMPrediction(station_name, measure_name)
+                predictions = lstmprediction.predictions.get(join_name)
+            model_data[measure_name] = predictions
+            model_data['type'] = model
+            datas.append(model_data)
+        datas = pd.concat(datas, axis = 0, ignore_index=True)
+        model_data = datas.iloc[:slider_value]
+        subset_data = pd.concat([subset_data, model_data], axis = 0)
     
-    # if no model selected
-    else:
-        # actually data
-        fig = px.line(subset_data, x = 'date', y = measure_name,
-                      labels = {measure_name: measure_conversions[measure_name],
-                                'date': 'Date [1D]'},
-                      title = f"{measure_conversions[measure_name]} by Date for {station_name}", markers = True)
-    
+    # actually data
+    fig = px.line(subset_data, x = 'date', y = measure_name, color = 'type',
+                    labels = {measure_name: measure_conversions[measure_name],
+                            'date': 'Date [1D]'},
+                    title = f"{measure_conversions[measure_name]} by Date for {station_name}", 
+                    markers = True)
     
     fig1 = create_seasonal_plots(subset_data, measure_name)
     return fig, fig1
