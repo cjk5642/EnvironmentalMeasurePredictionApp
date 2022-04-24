@@ -234,14 +234,24 @@ row_footer = html.Div([
 ], style = {"background-color": "gray", 
             "width": "100%"})
 
+all_loading = dcc.Loading(
+    id = 'loading-1',
+    type = 'default',
+    children = [
+        html.Div([
+            row_dropdowns,
+            row_slider,
+            html.Hr(),
+            row_figure
+        ])
+    ]
+)
+
 app.layout = dbc.Container(children = [
     row_header,
     row_info,
     html.Br(),
-    row_dropdowns,
-    row_slider,
-    html.Hr(),
-    row_figure,
+    all_loading,
     row_test,
     html.Hr()
 ])
@@ -262,6 +272,7 @@ def create_seasonal_plots(data, measure_name):
     return fig
                 
 @app.callback(
+    Output('loading-1', 'children'),
     Output('figureForecast', 'figure'),
     Output('figureSeasonal', 'figure'),
     Input('dropdownModels', 'value'),
@@ -334,6 +345,8 @@ def update_graph(model_name, station_name, measure_name, time_name, slider_value
 def ouput_test(model_name, station_name, measure_name, time_name, slider_value):
     return f"{model_name}, {station_name}, {measure_name}, {time_name}, {slider_value}"
 
+# Loading screen CSS
+app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/dZMMma?editors=1111"})
 
 if __name__ == '__main__':
     app.run_server(debug=True)

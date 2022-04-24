@@ -159,7 +159,7 @@ class WeatherData:
   def _calc_end_range(self, date, num_prev: int):
     return date + relativedelta(days = num_prev + 30)
 
-  def ml_data(self, start_date: str = '01/01/2021', num_prev: int = 365, normalize_by_values = False):
+  def ml_data(self, start_date: str = '01/01/2021', num_prev: int = 365, normalize_by_values = False, normalize_labels = False):
     start_date = pd.to_datetime(start_date)
 
     eventual = start_date + relativedelta(days=num_prev + 30)
@@ -213,8 +213,20 @@ class WeatherData:
         sub_data = values[(values['measure'] == measure) & (values['callsign'] == callsign)]
         mean, std = sub_data.iloc[:, :-2].mean(), sub_data.iloc[:, :-2].std() + 1e-23
         sub_data.iloc[:, :-2] = (sub_data.iloc[:, :-2] - mean) / std
+        sub_data = sub_data.reset_index()
         new_values.append(sub_data)
-      values = pd.concat(new_values, ignore_index=False).sort_index()
+      values = pd.concat(new_values, ignore_index=False).sort_values('index').drop('index', axis = 1)
 
-    values = pd.merge(pd.merge(values, WeatherData.ohe_callsign, on = 'callsign', how = 'outer'), WeatherData.ohe_measures, on = 'measure', how= 'outer')
-    return values, labels
+    if normalize_labels:
+      new_labels = []
+      callsign_measures = itertools.product(labels['callsign'].unique(), labels['measure'].unique())
+      for callsign, measure in tqdm(callsign_measures):
+        sub_data = labels[(labels['measure'] == measure) & (labels['callsign'] == callsign)]
+        mean, std = sub_data.iloc[:, :-2].mean(), sub_data.iloc[:, :-2].std() + 1e-23
+        sub_data.iloc[:, :-2] = (sub_data.iloc[:, :-2] - mean) / std
+        sub_data = sub_data.reset_index()
+        new_labels.append(sub_data)
+      labels = pd.concat(new_labels, ignore_index=False).sort_values('index').drop('index', axis = 1)
+
+    values = pd.merge(pd.merge(values, WeatherData.ohe_callsign, on = 'callsign', how = 'outer'), WeatherData.ohe_measures, on = 'measure', how= 'outer').drop(['callsign', 'measure'], axis = 1)
+    return values, labels.drop(['callsign', 'measure'], axis = 1)

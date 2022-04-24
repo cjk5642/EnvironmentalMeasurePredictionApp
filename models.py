@@ -5,14 +5,12 @@ Created on Thu Mar 31 19:05:08 2022
 @author: Collin
 """
 import pandas as pd
-from utils import WeatherData
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-from tensorflow import keras
 import tensorflow as tf
 from statsmodels.tsa.arima.model import ARIMA
+import statsmodels.api as sm
 import numpy as np
 from app import lstm_model, wd
+from dateutil.relativedelta import relativedelta
 
 def join_station_measure(station, measure):
     station = '-'.join(station.split(', ')).lower()
@@ -79,7 +77,7 @@ class WeatherARIMA:
     def _extract_order(self) -> tuple:
         data = WeatherARIMA.models.loc[(WeatherARIMA.models['callsign'] == self.callsign) & (WeatherARIMA.models['measure'] == self.measure), ['p', 'd', 'q']]
         order_values = data.values[0]
-        order = tuple(list(order_values))
+        order = list(order_values)
         return order
     
     def predict(self):
@@ -91,7 +89,7 @@ class WeatherARIMA:
         
         for i in range(len(test)):
             model = ARIMA(history, order = self.order).fit()
-            preds = model.forecast(n=1)
+            preds = model.forecast(n=30)
             yhat = preds[0]
             predictions.append(yhat)
             obs = test[i]
