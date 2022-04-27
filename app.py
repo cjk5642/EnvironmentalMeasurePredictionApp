@@ -78,6 +78,7 @@ measures = enviromental_measures()
 # state stylesheets
 external_stylesheets = [dbc.themes.SIMPLEX]
 app = Dash(__name__, external_stylesheets = external_stylesheets)
+server = app.server
 
 current_date = pd.to_datetime(datetime.now().date())
 
