@@ -68,7 +68,11 @@ class WeatherData:
     return data
 
   def _interpolate_data(self, data):
-    new= data.set_index(['callsign', 'date']).reset_index()
+    dates = pd.date_range(data['date'].min(), data['date'].max())
+    callsigns = list(data['callsign'].unique())
+    new= data.set_index(['callsign', 'date'])
+    index = pd.MultiIndex.from_product([callsigns, dates], names = ['callsign', 'date'])
+    new = new.reindex(index).reset_index()
     interpolated = []
     for u in new.callsign.unique():
       temp = new[new.callsign == u]
@@ -148,7 +152,6 @@ class WeatherData:
         if last_date < datetime.now().date()-relativedelta(days = 1):
           print("Updating weather by stations dataset...")
           new_data = self._collect_data_by_weather_station_helper(date = total_frames['date'].max())
-          new_data = self._interpolate_data(new_data)
           total_frames = pd.concat([total_frames, new_data], axis = 0, ignore_index = True)
           total_frames['date'] = pd.to_datetime(total_frames['date'])
           total_frames = total_frames.drop_duplicates(subset = ['callsign', 'date']).sort_values(['callsign', 'date'])
@@ -157,7 +160,7 @@ class WeatherData:
     return total_frames
   
   def _calc_end_range(self, date, num_prev: int):
-    return date + relativedelta(days = num_prev + 30)
+    return pd.to_datetime(date + relativedelta(days = num_prev + 30))
 
   def ml_data(self, start_date: str = '01/01/2021', num_prev: int = 365, normalize_by_values = False, normalize_labels = False):
     start_date = pd.to_datetime(start_date)
@@ -168,29 +171,30 @@ class WeatherData:
     first_filtered = WeatherData.weather_data.copy()
     first_filtered = first_filtered[first_filtered['date'] >= start_date]
     data = first_filtered.melt(id_vars = ['callsign', 'date'])
+    data = data.rename({"variable": "measure"}, axis = 1)
     data['date'] = pd.to_datetime(data['date'])
-    callsign_measure = list(set(zip(data['callsign'], data['variable'])))
+    callsign_measure = list(set(zip(data['callsign'], data['measure'])))
+    print(data)
 
     thirtydays = pd.to_timedelta("30 days")
     one_day = pd.to_timedelta("1 day")
 
     new_values, new_labels = [], []
     for c, m in tqdm(callsign_measure):
-      temp = data.loc[(data['callsign'] == c) & (data['variable'] == m), ['date', 'value']].set_index('date')
-      min_date = temp.index.min().date()
-      max_date = temp.index.max().date()
+      temp = data.loc[(data['callsign'] == c) & (data['measure'] == m), ['date', 'value']]
+      min_date = temp.date.min()
+      max_date = temp.date.max()
       collection = {'X': [], 'y': []}
       end_range = self._calc_end_range(min_date, num_prev = num_prev)
       while max_date != end_range:
-        row = temp.loc[min_date:end_range]
+        row = temp.loc[(temp['date'] >= min_date) & (temp['date'] <= end_range)]
         splits = end_range - thirtydays
-        values = row.loc[min_date:splits, 'value'].to_list()
-        labels = row.loc[splits+one_day:, 'value'].to_list()
+        values = row.loc[(row['date'] >= min_date) & (temp['date'] <= splits), 'value'].to_list()
+        labels = row.loc[row['date'] >= splits+one_day, 'value'].to_list()
         collection['X'].append(values)
         collection['y'].append(labels)
         min_date += one_day
         end_range = self._calc_end_range(min_date, num_prev = num_prev)
-      
       X = np.stack(collection['X'], axis = 0)
       y = np.stack(collection['y'], axis = 0)
       collection['X'] = pd.DataFrame(X)
@@ -208,25 +212,22 @@ class WeatherData:
 
     if normalize_by_values:
       new_values = []
-      callsign_measures = itertools.product(values['callsign'].unique(), values['measure'].unique())
-      for callsign, measure in tqdm(callsign_measures):
+      for callsign, measure in tqdm(callsign_measure):
         sub_data = values[(values['measure'] == measure) & (values['callsign'] == callsign)]
         mean, std = sub_data.iloc[:, :-2].mean(), sub_data.iloc[:, :-2].std() + 1e-23
         sub_data.iloc[:, :-2] = (sub_data.iloc[:, :-2] - mean) / std
-        sub_data = sub_data.reset_index()
         new_values.append(sub_data)
-      values = pd.concat(new_values, ignore_index=False).sort_values('index').drop('index', axis = 1)
+      values = pd.concat(new_values, ignore_index=False).sort_index()
 
     if normalize_labels:
       new_labels = []
-      callsign_measures = itertools.product(labels['callsign'].unique(), labels['measure'].unique())
-      for callsign, measure in tqdm(callsign_measures):
+      for callsign, measure in tqdm(callsign_measure):
         sub_data = labels[(labels['measure'] == measure) & (labels['callsign'] == callsign)]
         mean, std = sub_data.iloc[:, :-2].mean(), sub_data.iloc[:, :-2].std() + 1e-23
         sub_data.iloc[:, :-2] = (sub_data.iloc[:, :-2] - mean) / std
-        sub_data = sub_data.reset_index()
         new_labels.append(sub_data)
-      labels = pd.concat(new_labels, ignore_index=False).sort_values('index').drop('index', axis = 1)
+      labels = pd.concat(new_labels, ignore_index=False).sort_index()
 
-    values = pd.merge(pd.merge(values, WeatherData.ohe_callsign, on = 'callsign', how = 'outer'), WeatherData.ohe_measures, on = 'measure', how= 'outer').drop(['callsign', 'measure'], axis = 1)
-    return values, labels.drop(['callsign', 'measure'], axis = 1)
+    values = pd.merge(pd.merge(values, WeatherData.ohe_callsign, on = 'callsign', how = 'outer'), WeatherData.ohe_measures, on = 'measure', how= 'outer')
+    
+    return values, labels
