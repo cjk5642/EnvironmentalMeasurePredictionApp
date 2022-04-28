@@ -308,4 +308,4 @@ app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/dZMMma?edit
 app.css.append_css({'external_url': "./slider.css"})
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
