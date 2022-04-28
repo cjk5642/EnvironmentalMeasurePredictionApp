@@ -31,7 +31,7 @@ global lstm_model
 lstm_model = load_lstm_model()
 
 # get the stations
-wd = WeatherData(update = False)
+wd = WeatherData()
 
 # load the models
 from models import *
@@ -95,16 +95,20 @@ row_header = html.Div(
     ])
 )
 
+markdown = """
+# Environmental Measure Forecasting Application
+
+This application allows for forecasting different environmental measures using different models, ARIMA and LSTM. Choose which model works best for you!
+
+This is a final project for Times Series Analysis at Indiana University. The Front-end, Back-end, data processing, data cleaning, and ARIMA model was done by [Collin Kovacs](https://github.com/cjk5642). The LSTM model development, tuning and training was done by Pankaj Singh. The creation of the project and research of the projects was done by Matthew Yeseta.
+"""
+
+dcc.Markdown()
+
 row_info = html.Div(
     dbc.Row([
         dbc.Col([
-            html.P("""This application allows for forecasting different environmental
-                  measures using different models, ARIMA and LSTM. Choose which model works 
-                  best for you!
-                  
-                  This is a final project for Times Series Analysis at Indiana University.
-                  """
-            )
+            dcc.Markdown([markdown])
         ])
     ])
 )
@@ -213,39 +217,13 @@ row_slider = html.Div([
     className="mb-3"
 )
 
-row_test = html.Div(id = 'output-test')
-
-row_footer = html.Div([
-    dbc.Row([
-        dbc.Col([
-            html.P(
-                "Web Application: Collin J. Kovacs"
-            ),
-            html.P(
-                "ARIMA Model: Collin J. Kovacs"
-            ),
-            html.P(
-                "LSTM Model: Pankaj Singh"
-            )
-        ]),
-        dbc.Col([
-            html.Img(src = "images/indiana.png",
-                     width = '128px',
-                     height = '128px')     
-        ])
-    ])
-], style = {"background-color": "gray", 
-            "width": "100%"})
-
 app.layout = dbc.Container(children = [
-    row_header,
     row_info,
     html.Br(),
     row_dropdowns,
     row_slider,
     html.Hr(),
     row_figure,
-    row_test,
     html.Hr()
 ])
 
@@ -325,19 +303,9 @@ def update_graph(model_name, station_name, measure_name, time_name, slider_value
     fig1 = create_seasonal_plots(subset_data, measure_name)
     return fig, fig1
 
-@app.callback(
-    Output('output-test', 'children'),
-    Input('dropdownModels', 'value'),
-    Input('dropdownStations', 'value'),
-    Input('dropdownMeasure', 'value'),
-    Input('dropdownTime', 'value'),
-    Input('sliderForecast', 'value')
-    )
-def ouput_test(model_name, station_name, measure_name, time_name, slider_value):
-    return f"{model_name}, {station_name}, {measure_name}, {time_name}, {slider_value}"
-
 # Loading screen CSS
 app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/dZMMma?editors=1111"})
+app.css.append_css({'external_url': "./slider.css"})
 
 if __name__ == '__main__':
     app.run_server(debug=True)
