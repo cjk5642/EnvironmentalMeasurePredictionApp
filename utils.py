@@ -174,7 +174,6 @@ class WeatherData:
     data = data.rename({"variable": "measure"}, axis = 1)
     data['date'] = pd.to_datetime(data['date'])
     callsign_measure = list(set(zip(data['callsign'], data['measure'])))
-    print(data)
 
     thirtydays = pd.to_timedelta("30 days")
     one_day = pd.to_timedelta("1 day")
@@ -202,7 +201,7 @@ class WeatherData:
       
       # add the callsigns and measures
       for dat in ['X', 'y']:
-        for string_val, val in zip(['callsign', 'measure'], [c, m]):
+        for string_val, val in zip(['callsign', 'measure', 'row'], [c, m, range(len(collection['X']))]):
           collection[dat][string_val] = val
       new_values.append(collection['X'])
       new_labels.append(collection['y'])
@@ -210,24 +209,33 @@ class WeatherData:
     values = pd.concat(new_values, ignore_index = True)
     labels = pd.concat(new_labels, ignore_index = True)
 
+    # correct up to here
     if normalize_by_values:
       new_values = []
       for callsign, measure in tqdm(callsign_measure):
         sub_data = values[(values['measure'] == measure) & (values['callsign'] == callsign)]
-        mean, std = sub_data.iloc[:, :-2].mean(), sub_data.iloc[:, :-2].std() + 1e-23
-        sub_data.iloc[:, :-2] = (sub_data.iloc[:, :-2] - mean) / std
+        mean, std = sub_data.iloc[:, :-3].mean(), sub_data.iloc[:, :-3].std() + 1e-23
+        sub_data.iloc[:, :-3] = (sub_data.iloc[:, :-3] - mean) / std
         new_values.append(sub_data)
-      values = pd.concat(new_values, ignore_index=False).sort_index()
+      values = pd.concat(new_values, ignore_index=False)
 
+    # correct up to here
     if normalize_labels:
       new_labels = []
       for callsign, measure in tqdm(callsign_measure):
         sub_data = labels[(labels['measure'] == measure) & (labels['callsign'] == callsign)]
-        mean, std = sub_data.iloc[:, :-2].mean(), sub_data.iloc[:, :-2].std() + 1e-23
-        sub_data.iloc[:, :-2] = (sub_data.iloc[:, :-2] - mean) / std
+        mean, std = sub_data.iloc[:, :-3].mean(), sub_data.iloc[:, :-3].std() + 1e-23
+        sub_data.iloc[:, :-3] = (sub_data.iloc[:, :-3] - mean) / std
         new_labels.append(sub_data)
-      labels = pd.concat(new_labels, ignore_index=False).sort_index()
+      labels = pd.concat(new_labels, ignore_index=False)
 
-    values = pd.merge(pd.merge(values, WeatherData.ohe_callsign, on = 'callsign', how = 'outer'), WeatherData.ohe_measures, on = 'measure', how= 'outer')
-    
+    # correct up to here
+
+    values = values.sort_values(['callsign', 'measure', 'row']).reset_index(drop = True)
+    labels = labels.sort_values(['callsign', 'measure', 'row']).reset_index(drop = True)
+
+    new_values = pd.merge(pd.merge(values, WeatherData.ohe_callsign, on = 'callsign', how = 'outer'), WeatherData.ohe_measures, on = 'measure', how= 'outer')
+    new_values['row'] = values['row']
+    values = new_values.sort_values(['callsign', 'measure', 'row']).reset_index(drop = True)
+
     return values, labels
