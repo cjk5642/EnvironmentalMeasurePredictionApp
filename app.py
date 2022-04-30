@@ -31,7 +31,7 @@ global lstm_model
 lstm_model = load_lstm_model()
 
 # get the stations
-wd = WeatherData()
+wd = WeatherData(update=False)
 
 # load the models
 from models import *
